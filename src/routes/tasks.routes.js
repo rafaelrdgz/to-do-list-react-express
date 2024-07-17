@@ -1,9 +1,22 @@
-import {Router} from 'express'
+import { Router } from "express";
+import {
+  createTask,
+  deleteTask,
+  getAllTasks,
+  getTask,
+  updateTask,
+} from "../controllers/tasks.cotroller.js";
 
-const router = Router()
+const router = Router();
 
-router.get('/', (req, res) => {
-    res.send('hello world')
-})
+router.get("/tasks", getAllTasks);
 
-export default router
+router.get("/tasks/:id", getTask);
+
+router.post("/tasks", createTask);
+
+router.delete("/tasks/:id", deleteTask);
+
+router.put("/tasks/:id", updateTask);
+
+export default router;
