@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Card, CardContent, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
 
 export default function TaskList() {
   const [tasks, setTasks] = useState([]);
+	const navigate = useNavigate();
 
   const loadTasks = async () => {
     await axios.get("http://localhost:3000/tasks").then((res) => {
@@ -40,7 +43,7 @@ export default function TaskList() {
               <Button
                 variant="contained"
                 color="inherit"
-                onClick={() => console.log("Edit")}
+                onClick={() => navigate(`/tasks/${task.id}/edit`)}
               >
                 Edit
               </Button>

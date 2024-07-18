@@ -1,13 +1,12 @@
-import React from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 
 
@@ -17,21 +16,38 @@ export default function TaskForm() {
     description: "",
   });
 
+  const [editing, setEditing] = useState(false);
+
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false)
+  const params = useParams();
 
-  const handleSubmit = (e) => {
+  const loadTask = async (id) => {
+    await axios.get(`http://localhost:3000/tasks/${id}`).then((res) => {
+      setTask(res.data);
+      setEditing(true);
+    });
+  }
+
+  useEffect(() => {
+    if (params.id) {
+      loadTask(params.id);
+    }
+  }, [params.id]);  
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true)
-    axios.post("http://localhost:3000/tasks", task)
-    .then((res) => {
-      console.log(res.data);
-    })
 
+    if (editing) {
+      await axios.put(`http://localhost:3000/tasks/${params.id}`, task)
+      navigate("/");
+      return;
+    }
+
+    await axios.post("http://localhost:3000/tasks", task)
     setLoading(false)
     navigate("/");
-
   };
 
   const handleChange = (e) =>{
@@ -55,11 +71,12 @@ export default function TaskForm() {
             style={{ backgroundColor: "#1e272e", padding: "1rem" }}
           >
             <Typography variant="h5" color="white" textAlign="center">
-              Create Task
+              {editing ? "Edit" : "Create"} Task
             </Typography>
             <CardContent>
               <form onSubmit={handleSubmit}>
                 <TextField
+                  value={task.title}
                   label="Write your title"
                   variant="filled"
                   name="title"
@@ -69,6 +86,7 @@ export default function TaskForm() {
                   InputLabelProps={{ style: { color: "white" } }}
                 />
                 <TextField
+                  value={task.description}
                   label="Write your description"
                   variant="filled"
                   multiline
@@ -86,7 +104,7 @@ export default function TaskForm() {
                   onClick={handleSubmit}
                   disabled={!task.title || !task.description}
                 >
-                  {loading ? (<CircularProgress color="inherit" size={24}/>) : "Create Task"}
+                  {loading ? (<CircularProgress color="inherit" size={24}/>) : "Save"}
                 </Button>
               </form>
             </CardContent>
