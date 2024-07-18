@@ -6,7 +6,7 @@ export default function TaskList() {
   const [tasks, setTasks] = useState([]);
 
   const loadTasks = async () => {
-    axios.get("http://localhost:3000/tasks").then((res) => {
+    await axios.get("http://localhost:3000/tasks").then((res) => {
       setTasks(res.data);
     });
   };
@@ -14,6 +14,12 @@ export default function TaskList() {
   useEffect(() => {
     loadTasks();
   }, []);
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:3000/tasks/${id}`).then((res) => {
+      setTasks(tasks.filter((task) => task.id !== id));
+    });
+  };
 
   return (
     <div>
@@ -26,7 +32,7 @@ export default function TaskList() {
           <CardContent
             style={{ display: "flex", justifyContent: "space-between" }}
           >
-            <div style={{color: 'white'}}>
+            <div style={{ color: "white" }}>
               <Typography>{task.title}</Typography>
               <Typography>{task.description}</Typography>
             </div>
@@ -42,7 +48,7 @@ export default function TaskList() {
                 style={{ marginLeft: ".5rem" }}
                 variant="contained"
                 color="warning"
-                onClick={() => console.log("Delete")}
+                onClick={() => handleDelete(task.id)}
               >
                 Delete
               </Button>
